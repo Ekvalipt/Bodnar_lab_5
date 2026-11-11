@@ -1,23 +1,31 @@
 import React, { useState } from 'react';
 
 function UpdateList({ onAddTask }) {
-  const [value, setValue] = useState('');
+  const [name, setName] = useState('');
+  const [price, setPrice] = useState('');
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (value.trim()) {
-      onAddTask({ title: value.trim(), completed: false }); // Формат для API
+    if (name.trim() && price !== '') {
+      onAddTask({ name: name.trim(), price: Number(price) });
+      setName('');
+      setPrice('');
     }
-    setValue('');
   };
 
   return (
     <form className="update-form" onSubmit={handleSubmit}>
       <input
         type="text"
-        value={value}
-        onChange={(e) => setValue(e.target.value)}
-        placeholder="Нове завдання"
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+        placeholder="Назва товару"
+      />
+      <input
+        type="number"
+        value={price}
+        onChange={(e) => setPrice(e.target.value)}
+        placeholder="Ціна ($)"
       />
       <button type="submit">Додати</button>
     </form>

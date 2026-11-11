@@ -1,64 +1,60 @@
 import './App.css';
-import TodoList from './components/TodoList'; // Зверни увагу на регістр
+import TodoList from './components/TodoList';
 import UpdateList from './components/UpdateList';
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 
 function App() {
   const [tasks, updateTasks] = useState([]);
-  const apiUrl = 'https://jsonplaceholder.typicode.com/todos';
+  const apiUrl = 'http://localhost:5000/products';
 
-  // Отримання даних (GET)[cite: 144]
+  // 1. Отримання списку товарів з MongoDB
+  const fetchTasks = async () => {
+    try {
+      const res = await axios.get(apiUrl);
+      updateTasks(res.data);
+    } catch (err) {
+      console.error('Помилка завантаження товарів:', err);
+    }
+  };
+
   useEffect(() => {
-    const fetchTasks = async () => {
-      try {
-        const res = await axios.get(`${apiUrl}?_limit=5`); // Беремо лише перші 5 для зручності
-        updateTasks(res.data);
-      } catch (err) {
-        console.error('Помилка завантаження завдань:', err);
-      }
-    };
     fetchTasks();
   }, []);
 
-  // Додавання (POST)[cite: 145]
+  // 2. Додавання товару (POST)
   const addTask = async (newTaskData) => {
     try {
       const res = await axios.post(apiUrl, newTaskData);
-      // JSONPlaceholder повертає id=201 для всіх нових, створюємо фейковий унікальний id для коректного відображення
-      const createdTask = { ...res.data, id: Date.now() }; 
-      updateTasks((prev) => [...prev, createdTask]);
+      updateTasks((prev) => [...prev, res.data]);
     } catch (err) {
       console.error('Помилка додавання:', err);
     }
   };
 
-  // Видалення (DELETE)[cite: 142]
+  // 3. Видалення товару за _id (DELETE)
   const removeTask = async (idToRemove) => {
     try {
       await axios.delete(`${apiUrl}/${idToRemove}`);
-      updateTasks((prev) => prev.filter(task => task.id !== idToRemove));
+      updateTasks((prev) => prev.filter(task => task._id !== idToRemove));
     } catch (err) {
       console.error('Помилка видалення:', err);
     }
   };
 
-  // Редагування (PUT)[cite: 143, 145]
+  // 4. Редагування товару за _id (PUT)
   const editTask = async (idToEdit, updatedTaskData) => {
-     try {
-       // Для фейкових id (які ми додали локально) API поверне 404, тому робимо перевірку
-       if (idToEdit <= 200) { 
-         await axios.put(`${apiUrl}/${idToEdit}`, updatedTaskData);
-       }
-       updateTasks((prev) => prev.map(task => task.id === idToEdit ? updatedTaskData : task));
-     } catch (err) {
-       console.error('Помилка редагування:', err);
-     }
-  }
+    try {
+      const res = await axios.put(`${apiUrl}/${idToEdit}`, updatedTaskData);
+      updateTasks((prev) => prev.map(task => task._id === idToEdit ? res.data : task));
+    } catch (err) {
+      console.error('Помилка редагування:', err);
+    }
+  };
 
   return (
     <div className='container'>
-      <h2>Мій список завдань</h2>
+      <h2>Мій список товарів (MongoDB)</h2>
       <UpdateList onAddTask={addTask} />
       <TodoList tasks={tasks} onDelete={removeTask} onEdit={editTask} />
     </div>
