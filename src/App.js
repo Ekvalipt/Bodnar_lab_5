@@ -6,7 +6,7 @@ import axios from 'axios';
 
 function App() {
   const [tasks, updateTasks] = useState([]);
-  const apiUrl = 'http://localhost:5000/products';
+  const apiUrl = 'https://bodnar-lab-5.onrender.com/products';
 
   // 1. Отримання списку товарів з MongoDB
   const fetchTasks = async () => {
