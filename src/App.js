@@ -11,7 +11,7 @@ function App() {
   // 1. Отримання списку товарів з MongoDB
   const fetchTasks = async () => {
     try {
-      const res = await axios.get(apiUrl);
+      const res = await axios.get(apiUrl); // Цей рядок обов'язковий
       updateTasks(res.data);
     } catch (err) {
       console.error('Помилка завантаження товарів:', err);
